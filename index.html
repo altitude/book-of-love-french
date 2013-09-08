@@ -1,0 +1,146 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Book of Löve</title>
+	<link rel="stylesheet" type="text/css" href="chunk.css">
+	<script src="js/cufon-yui.js" type="text/javascript"></script>
+	<script src="js/pt-sans.cufonfonts.js" type="text/javascript"></script>
+	<script type="text/javascript" src="js/jquery203.js"></script>
+	<script type="text/javascript">
+	</script>
+	<script type="text/javascript">
+		var body;
+		$(document).ready(function(){
+			body = $("body").html();
+			smoothFont();
+		});
+		function smoothFont(){
+			Cufon.replace('.pt-sans, p, ul.summary', { fontFamily: 'PT Sans', hover: true });
+			Cufon.replace('.bold, b, h1, h2, h3, h4', { fontFamily: 'PT Sans Bold', hover: true });
+		}
+	</script>
+</head>
+
+<body>
+	<h1>Book of Löve2D</h1>
+	<ul class="summary">
+		<li><a href="#step_1">Introduction</a></li>
+		<li><a href="#step_2">Installation des outils</a></li>
+		<li><a href="#step_3">Prise en main du framework</a></li>
+		<ul>
+			<li><a href="#step_3_1">Affichage d'un sprite</a></li>
+			<li><a href="#step_3_2">Lecture de sons</a></li>
+			<li><a href="#step_3_3">Utilisation des entrées clavier/souris</a></li>
+		</ul>
+		<li><a href="#step_4">Architecture en modules</a></li>
+		<li><a href="#step_5">Exemple de jeu de plateforme</a></li>
+		<li><a href="#step_6">Optimisations graphiques</a></li>
+		<li><a href="#step_7">Interagir avec Internet</a></li>
+		<ul>
+			<li><a href="#step_7_1">Ajout de composants, mises à jour</a></li>
+			<li><a href="#step_7_2">Jeu multijoueur, client/serveur en lua</a></li>
+		</ul>
+		<li><a href="#step_8">Préparer son jeu pour la distribution</a></li>
+		<li><a href="#step_9">Liens externes</a></li>
+		<li><a href="#step_10">Conclusion</a></li>
+	</ul>
+	<div id="guide">
+		<h2 id="step_1">1. Introduction</h2>
+		<p>Dans ce guide, je vais vous apprendre à créer des jeux 2D stupéfiants grâce au framework Löve. Il n'est pas nécéssaire de savoir déjà bien programmer, Löve interprétant du <a href="http://fr.wikipedia.org/wiki/Lua">Lua</a>, un langage assez simple et accessible aux débutants.</p>
+		<p><b>NB:</b> Pour éviter des problèmes de lissage de texte, il se peut que, selon votre navigateur et OS, cette page utilise Cufon. Si vous souhaitez désactiver ce lissage, rendez-vous dans les réglages et décochez la case <b>lissage cufon</b>.<br>Aussi, ce guide est actuellement en construction. Il se peut qu'à l'heure où vous lisez ces lignes, toutes les parties ne soient pas complétées.</p>
+		<!-- // -->
+		<h2 id="step_2">2. Installation des outils</h2>
+		<p>Pour suivre ce guide, vous aurez besoin de deux choses. Un éditeur de texte avec colorisation syntaxique, et l'interpréteur Löve.</p>
+		<h3>Éditeur de code</h3>
+		<p>Si vous n'avez pas d'éditeur de code déjà installé, je ne peux que vous conseiller <a href="http://www.sublimetext.com/">Sublime Text</a>. C'est un logiciel qui possède toutes les fonctions dont nous aurons besoin tout en gardant une interface claire et simple. Il n'est pas gratuit, mais possède une version d'essai complète illimitée dans le temps.<br><br>Rendez-vous sur la page <a href="http://www.sublimetext.com/2">Downloads</a>, téléchargez la version correspondant à votre OS et lancez l'installation.</p>
+		<h3>Interpréteur Löve</h3>
+		<p>Rien de plus simple, rendez-vous simplement sur <a href="https://love2d.org/">la page officielle</a> du projet, téléchargez la version correspondant à votre OS et lancez l'installation.</p>
+		<!-- // -->
+		<h2 id="step_3">3. Prise en main du framework</h2>
+		<p>Nous allons commencer par créer notre premier projet. En fait, pas besoin de grand chose. Créez un <b>nouveau dossier</b> sur votre ordinateur, "tuto_love" par exemple, à l'emplacement que vous voulez.<br><br>Maintenant, ouvrez Sublime Text. Dans l'onglet <b>Project</b>, faites <b>Add Folder to Project</b>, sélectionnez votre dossier puis <b>OK</b>. Cela nous facilitera les choses, puisqu'à présent votre dossier apparait sur le paneau de gauche.</p>
+		<img src="img/step_3_img0.png">
+		<p>Nous allons maintenant créer un fichier <b>main.lua</b>, c'est ce fichier que Löve se chargera d'éxécuter dès le lancement du jeu. Pour cela, faites un simple clic droit sur votre dossier dans le panneau de gauche, et New File. Un nouvel onglet apparaît dans l'éditeur, faites <b>Ctrl+S</b>, nommez ce fichier main.lua puis <b>OK</b></p>
+		<img src="img/step_3_img1.png">
+		<p>Votre espace de travail devrait désormais ressembler à ça :</p>
+		<img src="img/step_3_img2.png">
+		<p>Bien ! Maintenant, nous allons pouvoir commencer les choses sérieuses.</p>
+		<h3 id="step_3_1">3.1. Affichage d'un Sprite</h3>
+		<p>Pour comprendre comment afficher un <a href="http://fr.wikipedia.org/wiki/Sprite_(jeu_vid%C3%A9o)">sprite</a> sur notre écran, il faut d'abord comprendre comment fonctionne un jeu Löve. Rassurez-vous, c'est très simple. Comme je vous l'ai indiqué précédemment, c'est un fichier <b>main.lua</b> que Löve va rechercher et éxécuter au lancement du jeu. Dans ce fichier, Löve va ensuite chercher plusieurs fonctions : </p>
+		<h3>love.load</h3>
+		<p>Cette fonction contiendra toute la logique d'initialisation de votre jeu. Comme le chargement des images, préparation d'une carte, d'un personnage, etc...</p>
+		<h3>love.update</h3>
+		<p>Cette fonction sera exécutée à chaque "boucle" de jeu. Nous en parlerons plus tard.</p>
+		<h3>love.draw</h3>
+		<p>C'est dans cette fonction que nous contrôlons tout ce qui se passe à l'écran.</p>
+		<p>Ce sont les trois fonctions principales. Il y en a d'autres, nous en parlerons dans la suite de ce guide. Sachez que ces fonctions sont appellées les <a href="https://www.love2d.org/wiki/Tutorial:Callback_Functions">fonctions de callback</a>. Bien ! Copiez collez donc ces trois fonctions dans votre <b>main.lua</b> :</p>
+		<!-- CODE -->
+		<textarea class="code" spellcheck="false" style="min-height:200px;">function love.load()
+
+end
+
+function love.update()
+
+end
+
+function love.draw()
+
+end</textarea>
+		<!-- END CODE -->
+		<p>Pour afficher un sprite, nous aurons besoin d'une image ! J'utiliserais cette carotte en provenance de minecraft, libre à vous de l'utiliser ou de choisir une autre image.</p>
+		<img src="img/carrot.png">
+		<p>L'important étant de <b>copier</b> cette image dans votre dossier <b>tuto_love</b>. Votre espace de travail devrait désormais ressembler à ça :</p>
+		<img src="img/step_3_img3.png">
+		<p>Bien. Pour afficher notre chère carotte sur l'écran, il faut tout d'abord la charger ! Cela se fait très simplement par l'appel de la fonction <b>love.graphics.newImage</b>. Et bien sûr, nous allons placer ce chargement dans <b>love.load</b>, comme ça notre image sera chargée dès le début du jeu, et une seule fois.</p>
+		<!-- CODE -->
+		<textarea class="code" spellcheck="false" style="min-height:100px;">function love.load()
+	carotte = love.graphics.newImage("carrot.png")
+end</textarea>
+		<!-- END CODE -->
+		<p>Dans ce bout de code, nous avons fait deux choses. Tout d'abord créé une nouvelle variable de nom carotte via <b>carotte =</b>, et nous lui avons directement assigné l'image chargée par <b>love.graphics.newImage</b>. La variable carotte sera maintenant accessible dans l'ensemble du jeu. Ça tombe bien, nous ce qu'on veut, c'est l'afficher, et donc l'utiliser dans <b>love.draw</b>.</p>
+		<p>Pour dessiner à l'écran notre image précédemment chargée, encore une fois c'est très simple, il suffit d'appeler la fonction <b>love.graphics.draw</b>, avec en paramètres l'<b>image</b> à dessiner, la <b>position x</b> et la <b>position y</b> souhaitées. Allons-y :</p>
+		<!-- CODE -->
+		<textarea class="code" spellcheck="false" style="min-height:100px;">function love.draw()
+	love.graphics.draw(carotte,100,100)
+end</textarea>
+		<!-- END CODE -->
+		<p>Votre espace de travail devrait donc désormais ressembler à ça :</p>
+		<img src="img/step_3_img4.png">
+		<p>Bien ! Nous sommes déjà prêts à lancer ce premier jeu. C'était du rapide n'est-ce pas ? Pour lancer un jeu avec Löve, c'est très simple. Il suffit de faire <b>glisser</b> le dossier contenant le <b>main.lua</b> sur <b>l'icone de Löve</b> :</p>
+		<img src="img/step_3_img5.png">
+		<p>Le jeu se lance !</p>
+		<img src="img/step_3_img6.png">
+		<p>Comme prévu, notre carotte s'affiche en 100,100. Par contre, la fenêtre s'intitule Untitled et elle est un peu grande. Voyons comment régler ça grâce au fichier <b>conf.lua</b>.</p>
+		<p>Créez un nouveau fichier dans votre dossier <b>tuto_love</b>, comme nous avons appris à le faire, et nommez-le <b>conf.lua</b>. Collez-y la fonction suivante :</p>
+		<!-- CODE -->
+		<textarea class="code" spellcheck="false" style="min-height:100px;">function love.conf(t)
+
+end</textarea>
+		<!-- END CODE -->
+		<p>Nous pouvons maintenant insérer dans cette fonction des paramètres de configurations. De <a href="https://love2d.org/wiki/Config_Files">nombreuses options</a> sont disponibles, mais voyons déjà comment modifier la taille de la fenêtre et son titre.</p>
+		<!-- CODE -->
+		<textarea class="code" spellcheck="false" style="min-height:100px;">function love.conf(t)
+	t.title = "Super Carotte"
+	t.screen.width = 200
+	t.screen.height = 200
+end</textarea>
+		<!-- END CODE -->
+		<p><b>t.title</b> est utilisé pour modifier le titre de la fenêtre, <b>t.screen.width</b> sa largeur, et <b>t.screen.height</b> sa hauteur, en <b>pixels</b>.</p>
+		<img src="img/step_3_img7.png">
+		<p>Voyons ce que cela donne maintenant en lançant le jeu :</p>
+		<img src="img/step_3_img8.png">
+		<p>C'est mieux ! Ou pas, en fait ça dépend de ce que l'on veut faire. Je vous laisse bidouiller un peu ces valeurs pour vous familiariser avec le framework. En tout cas, nous avons réussi à afficher un sprite. Vous avez bien avancé, cette sous partie est terminée !</p>
+		<h3 id="step_3_2">3.2. Lecture de sons</h3>
+		<p>Partie à compléter</p>
+		<h3 id="step_3_3">3.3. Utilisation des entrées clavier/souris</h3>
+		<p>Dans cette partie, nous allons apprendre à utiliser les entrées utilisateur pour les faire interagir avec votre jeu. Commençons par la souris.</p>
+		<h3>La souris</h3>
+		<p>L'objet <a href="https://www.love2d.org/wiki/love.mouse">love.mouse</a> nous fournit plusieurs fonctions pour récupérer les données de la souris. Parmi ces fonctions, notons la présence de <b>love.mouse.getX</b> et <b>love.mouse.getY</b> permettant de récupérer respectivement les positions X et Y de la souris dans la fenêtre. <br><br>Reprenons notre main.lua du dossier <b>tuto_love</b> de tout à l'heure, et dans <b>love.draw</b> remplaçons les coordonnées d'affichage de la carotte par les appels de fonctions suivants :</p>
+		<!-- CODE -->
+		<textarea class="code" spellcheck="false" style="min-height:100px;">function love.draw()
+	love.graphics.draw(carotte,love.mouse.getX(),love.mouse.getY())
+end</textarea>
+		<!-- END CODE -->
+	</div><br>
+</body>
+
+</html>
